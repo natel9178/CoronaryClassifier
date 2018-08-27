@@ -20,31 +20,30 @@ def build_model(is_training, params):
     model.add(conv_base)
     model.add(layers.Flatten())
     model.add(layers.Dropout(0.5))
-    model.add(layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01),
-                           activity_regularizer=regularizers.l1(0.01)))
+    model.add(layers.Dense(64, activation='relu')
     model.add(layers.Dense(5, activation='sigmoid'))
 
     # Below freeze all the the VGG16 as untrainable except the last few layers. Look at structure of the VGG16 listed above
 
-    conv_base.trainable = True
-    set_trainable = False
+    conv_base.trainable=True
+    set_trainable=False
     for layer in conv_base.layers:
         if layer.name == 'block5_conv1':
-            set_trainable = True
-        layer.trainable = set_trainable
+            set_trainable=True
+        layer.trainable=set_trainable
     print(model.summary())
     return model
 
 
 def train_model(model, train_labels, train_data, val_labels, val_data, epochs=30, batch_size=16):
-    INIT_LR = 0.0001
-    adam = optimizers.Adam(lr=INIT_LR)
+    INIT_LR=0.0001
+    adam=optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam, loss='binary_crossentropy',
                   metrics=['accuracy'])
     print("dimension of train_images, train_labels,dev_images, dev_labels")
     print(train_data.shape, train_labels.shape, val_data.shape,
           val_labels.shape)
-    history = model.fit(
+    history=model.fit(
         train_data,
         train_labels,
         epochs=30,
