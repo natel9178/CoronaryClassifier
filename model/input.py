@@ -13,7 +13,7 @@ the picture is converted to dimenston height/difeth set below, using CV2)
 '''
 
 
-def imageload(data_directory, filename_label_position=0, dimheight=128, dimwidth=128):
+def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth=224):
     labels = {}  # creat train_label and train_data dictionary
     data = {}
     filenames = set()
