@@ -3,6 +3,15 @@ import cv2
 import matplotlib
 import numpy as np
 
+'''
+Call to load images into initial arrays,
+the data file digits preceding the "-" are the label, for instance filename_label_position=0,
+means the position 0 (first digit) is the label of interest
+in our dataset, first digit is normal (=0), vs abnormal (=1)
+second digit is which artery (0=left main, 1=LAD, 2= LCx, 3= RCA)
+the picture is converted to dimenston height/difeth set below, using CV2)
+'''
+
 
 def imageload(data_directory, filename_label_position=0, dimheight=128, dimwidth=128):
     labels = {}  # creat train_label and train_data dictionary

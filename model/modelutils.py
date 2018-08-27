@@ -36,3 +36,26 @@ def numparize(labels, data):
         label_np[i] = labels[i]
 
     return label_np, data_np
+
+
+def describe(train_label_np, train_data_np, dev_label_np, dev_data_np,
+             test_label_np, test_data_np):
+    # this takes numpy array training data and return: height, width, train_size, dev_size, test_size,categories, category_num
+    import numpy as np
+    train_size, height, width, channel = np.shape(train_data_np)
+
+    dev_size, _, _, _ = np.shape(dev_data_np)
+    test_size, _, _, _ = np.shape(test_data_np)
+    categories = np.unique(train_label_np)
+    category_num = len(categories)
+
+    print("Sanity Check:")
+    print("height=", height, " width=", width, " channel=", channel)
+    print("training set size=", train_size, "   development set size=", dev_size,
+          "   test set size=", test_size)
+    print("categories=", categories)
+    print("number of category=", category_num)
+
+    print("------------")
+
+    return height, width, channel, train_size, dev_size, test_size, categories, category_num
