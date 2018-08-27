@@ -58,11 +58,11 @@ def merge_labels(binary_labels, categorical_labels):
         binary_labels_shape[1] - 1) + categorical_labels_shape[1]
     sample_size = binary_labels_shape[0]  # sample size
     # create new numpy array of 0
-    train_labels_merged = np.zeros((sample_size, oneshot_column_merged))
+    labels_merged = np.zeros((sample_size, oneshot_column_merged))
 
-    train_labels_merged[0:sample_size, 0:(binary_labels_shape[1] - 1)] = binary_labels[0:sample_size, 1].reshape(
+    labels_merged[0:sample_size, 0:(binary_labels_shape[1] - 1)] = binary_labels[0:sample_size, 1].reshape(
         (sample_size, 1))  # put the smaller array into the bigger array
-    train_labels_merged[0:sample_size,
-                        (binary_labels_shape[1] - 1):oneshot_column_merged] = categorical_labels
+    labels_merged[0:sample_size,
+                  (binary_labels_shape[1] - 1):oneshot_column_merged] = categorical_labels
 
-    return train_labels_merged
+    return labels_merged
