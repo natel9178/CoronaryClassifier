@@ -46,8 +46,8 @@ def train_model(model, train_labels, train_data, val_labels, val_data, epochs=30
     history=model.fit(
         train_data,
         train_labels,
-        epochs=30,
-        batch_size=16,
+        epochs=epochs,
+        batch_size=batch_size,
         validation_data=(val_data, val_labels))
 
     # save the pareameter of the model
