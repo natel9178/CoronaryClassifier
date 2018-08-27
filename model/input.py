@@ -46,3 +46,23 @@ def imageload(data_directory, filename_label_position=0, dimheight=128, dimwidth
             i += 1
 
     return labels, data
+
+
+def merge_labels(binary_labels, categorical_labels):
+    # joining the two numpy arrray of one-shot into one
+    # describe the train-label and label-1
+    binary_labels_shape = np.shape(binary_labels)
+    categorical_labels_shape = np.shape(categorical_labels)
+    # so how many columns do we need in tatpe
+    oneshot_column_merged = (
+        binary_labels_shape[1] - 1) + categorical_labels_shape[1]
+    sample_size = binary_labels_shape[0]  # sample size
+    # create new numpy array of 0
+    train_labels_merged = np.zeros((sample_size, oneshot_column_merged))
+
+    train_labels_merged[0:sample_size, 0:(binary_labels_shape[1] - 1)] = binary_labels[0:sample_size, 1].reshape(
+        (sample_size, 1))  # put the smaller array into the bigger array
+    train_labels_merged[0:sample_size,
+                        (binary_labels_shape[1] - 1):oneshot_column_merged] = categorical_labels
+
+    return train_labels_merged
