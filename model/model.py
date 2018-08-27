@@ -12,7 +12,6 @@ def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
     conv_base = VGG16(weights='imagenet', include_top=False,
                       input_shape=(height, width, channel))
-    print(conv_base.summary())
 
     # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
 
@@ -30,11 +29,8 @@ def build_model(is_training, params):
     for layer in conv_base.layers:
         if layer.name == 'block5_conv1':
             set_trainable = True
-        if set_trainable:
-            layer.trainable = True
-        else:
-            layer.trainable = False
-
+        layer.trainable = set_trainable
+    print(conv_base.summary())
     return model
 
 
