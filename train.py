@@ -30,12 +30,13 @@ parser.add_argument('--restore_from', default=None,
 if __name__ == '__main__':
     # Set the random seed for the whole graph for reproductible experiments
     tf.set_random_seed(230)
+    args = parser.parse_args()
 
     # Part 1: extract first digit data (Normal or abnormal)
 
     # define the paths to training, development sets
-    mypath_train = "./data/train"
-    mypath_dev = "./data/dev"
+    mypath_train = os.path.join(args.data_dir, 'train')
+    mypath_dev = os.path.join(args.data_dir, 'dev')
 
     train_labels, train_data = imageload(mypath_train)
     dev_labels, dev_data = imageload(mypath_dev)
