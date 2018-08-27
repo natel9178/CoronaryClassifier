@@ -6,6 +6,7 @@ from keras.utils import to_categorical
 from keras import models
 from keras import layers
 from keras import optimizers
+from keras import regularizers
 
 
 def build_model(is_training, params):
@@ -19,7 +20,8 @@ def build_model(is_training, params):
     model.add(conv_base)
     model.add(layers.Flatten())
     model.add(layers.Dropout(0.5))
-    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01),
+                           activity_regularizer=regularizers.l1(0.01)))
     model.add(layers.Dense(5, activation='sigmoid'))
 
     # Below freeze all the the VGG16 as untrainable except the last few layers. Look at structure of the VGG16 listed above

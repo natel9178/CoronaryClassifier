@@ -12,7 +12,7 @@ import numpy as np
 from model.input import imageload, merge_labels
 from model.modelutils import numparize, describe
 from model.model import build_model, train_model
-from model.evaluate import print_plot_keras_metrics
+from model.evaluate import print_plot_keras_metrics, eval_model
 from keras.applications import VGG16
 from keras.utils import to_categorical
 from keras import models
@@ -107,3 +107,5 @@ if __name__ == '__main__':
 
     # print the graph of learning history for diagnostic purpose.
     print_plot_keras_metrics(history)
+    eval_model(model, dev_labels, dev_data, dev_label_np,
+               dev_data_np, dev_label_np1, dev_data_np1)
