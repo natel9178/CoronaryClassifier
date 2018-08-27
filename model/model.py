@@ -30,7 +30,7 @@ def build_model(is_training, params):
         if layer.name == 'block5_conv1':
             set_trainable = True
         layer.trainable = set_trainable
-    print(conv_base.summary())
+    print(model.summary())
     return model
 
 
