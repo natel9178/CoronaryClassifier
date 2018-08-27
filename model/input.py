@@ -4,35 +4,36 @@ import matplotlib
 import numpy as np
 
 
-def imageload(mypath_train, mypath_dev, mypath_test, filename_label_position,
-              dimheight, dimwidth):
-    train_label = {}  # creat train_label and train_data dictionary
-    train_data = {}
-    set_of_file = set()
+def imageload(data_directory, filename_label_position=0, dimheight=128, dimwidth=128):
+    labels = {}  # creat train_label and train_data dictionary
+    data = {}
+    filenames = set()
     i = 0
-    for root, dir, files in os.walk(
-            mypath_train):  # walk through all files in the folder
+
+    # walk through all files in the folder
+    for _, _, files in os.walk(data_directory):
         for file in files:
-            if file[0] == ".":
+            if file[0] == "." or file in filenames:
                 continue
-            if file in set_of_file:
-                continue
-            set_of_file.add(file)  # make sure file not duplicate
-            mypath_file = os.path.join(mypath_train,
-                                       file)  # define the path with directory
+
+            filenames.add(file)  # make sure file not duplicate
+            # define the path with directory
+            mypath_file = os.path.join(data_directory, file)
             img = cv2.imread(mypath_file)  # read with OPenCV first
-            print(mypath_file)
 
             # read with Open CV. note: expect color images
+            # resize with OpenCV
             resized_img = cv2.resize(
-                img, (dimheight, dimwidth),
-                interpolation=cv2.INTER_AREA)  # resize with OpenCV
-            train_label[i] = file[
-                filename_label_position]  # obtain label of data (the character position is used to indicate categories)
+                img, (dimheight, dimwidth), interpolation=cv2.INTER_AREA)
+            # obtain label of data (the character position is used to indicate categories)
+            labels[i] = file[filename_label_position]
 
-            img1 = np.array(
-                resized_img)  # numparize the resized image into a numpay array
-            train_data[
-                i] = img1  #store the numpay array into a dictionary (here this is train_data)
+            # numparize the resized image into a numpay array
+            img1 = np.array(resized_img)
+
+            # store the numpay array into a dictionary (here this is data)
+            data[i] = img1
+
             i += 1
-    return train_label, train_data, dev_label, dev_data, test_label, test_data
+
+    return labels, data

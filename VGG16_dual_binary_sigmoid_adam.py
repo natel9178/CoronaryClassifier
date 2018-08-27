@@ -1,157 +1,10 @@
-## go into three sets of data (train,, dev, test) with images, the first latter of file name is the category.
-# convert the label into a dictionary: train_label, dev_label, test-label. The list is ordered amse as image order
-# convert image into numpy array, and store in dictionary:  train_data, dev_data, test_data
-
-
-def imageload(mypath_train, mypath_dev, mypath_test, filename_label_position,
-              dimheight, dimwidth):
-    # resize to (dimheight,dimwidth) using cv
-    # path to training, development, test=mypath_train, mypath_dev, mypath_test
-    import os
-    import cv2
-    import matplotlib
-    import numpy as np
-
-    # training set
-    train_label = {}  # creat train_label and train_data dictionary
-    train_data = {}
-    set_of_file = set()
-    i = 0
-    for root, dir, files in os.walk(
-            mypath_train):  # walk through all files in the folder
-        for file in files:
-            if file[0] == ".":
-                continue
-            if file in set_of_file:
-                continue
-            set_of_file.add(file)  # make sure file not duplicate
-            mypath_file = os.path.join(mypath_train,
-                                       file)  # define the path with directory
-            img = cv2.imread(mypath_file)  # read with OPenCV first
-            print(mypath_file)
-
-            # read with Open CV. note: expect color images
-            resized_img = cv2.resize(
-                img, (dimheight, dimwidth),
-                interpolation=cv2.INTER_AREA)  # resize with OpenCV
-            train_label[i] = file[
-                filename_label_position]  # obtain label of data (the character position is used to indicate categories)
-
-            img1 = np.array(
-                resized_img)  # numparize the resized image into a numpay array
-            train_data[
-                i] = img1  #store the numpay array into a dictionary (here this is train_data)
-            i += 1
-
-#same idea repeated below for development set and test set .........
-
-# development set
-    dev_label = {}
-    dev_data = {}
-    set_of_file = set()
-    i = 0
-
-    for root, dir, files in os.walk(mypath_dev):
-        for file in files:
-
-            if file[0] == ".":
-                continue
-            if file in set_of_file:
-                continue
-            set_of_file.add(file)
-            mypath_file = os.path.join(mypath_dev, file)
-            print(mypath_file)
-            img = cv2.imread(mypath_file, cv2.IMREAD_COLOR)
-
-            resized_img = cv2.resize(
-                img, (dimheight, dimwidth), interpolation=cv2.INTER_AREA)
-            dev_label[i] = file[filename_label_position]
-            img1 = np.array(resized_img)
-            dev_data[i] = img1
-            i += 1
-
-# test set
-    test_label = {}
-    test_data = {}
-    set_of_file = set()
-    i = 0
-
-    for root, dir, files in os.walk(mypath_test):
-        for file in files:
-            if file[0] == ".":
-                continue
-            if file in set_of_file:
-                continue
-            set_of_file.add(file)
-            mypath_file = os.path.join(mypath_test, file)
-            print(mypath_file)
-            img = cv2.imread(mypath_file, cv2.IMREAD_COLOR)
-            resized_img = cv2.resize(
-                img, (dimheight, dimwidth), interpolation=cv2.INTER_AREA)
-            test_label[i] = file[filename_label_position]
-
-            img1 = np.array(resized_img)
-            test_data[i] = img1
-            i += 1
-
-    return train_label, train_data, dev_label, dev_data, test_label, test_data
-
-
-## convert dictionaries train_label, dev_label, test-label,  (train_data, dev_data, test_data into numpy array
-## assume that all images are same shape
-
-
-def numparize(train_label, train_data, dev_label, dev_data, test_label,
-              test_data):
-
-    #1. check if label and data set have same number
-    import numpy as np
-
-    if (len(train_label) != len(train_data)) or (
-            len(dev_label) != len(dev_data)) or (len(test_label) !=
-                                                 len(test_data)):
-        print("error in data and label size")
-        exit()
-
-    #2 obtaining size of the dictionaries in numpy arrays
-    len_train = len(train_label)  ##all these sets were dictionary
-    len_dev = len(dev_label)
-    len_test = len(test_label)
-
-    imageshape = np.shape(
-        train_data[0]
-    )  ## train_data is supposed to be a dictionary of (index, numpy array of resized image).
-    ## we only look at the first one
-    height, width, channel = imageshape  ## the height and width were obtained from the shaoe abive
-    #expect color image
-
-    #3 Initializing new numpy array
-    train_label_np = np.zeros((len_train, 1))
-    dev_label_np = np.zeros((len_dev, 1))
-    test_label_np = np.zeros((len_test, 1))
-
-    train_data_np = np.zeros((len_train, height, width, channel))
-    dev_data_np = np.zeros((len_dev, height, width, channel))
-    test_data_np = np.zeros((len_test, height, width, channel))
-
-    # 4  converting data to numpy
-
-    for i in range(len_train):
-        train_data_np[i, :, :, :] = train_data[i]
-        train_label_np[i] = train_label[i]
-    for i in range(len_dev):
-        dev_data_np[i, :, :, :] = dev_data[i]
-        dev_label_np[i] = dev_label[i]
-    for i in range(len_test):
-        test_data_np[i, :, :, :] = test_data[i]
-        test_label_np[i] = test_label[i]
-
-    return train_label_np, train_data_np, dev_label_np, dev_data_np, test_label_np, test_data_np
+from model.input import imageload
+from model.modelutils import numparize
 
 
 def describe(train_label_np, train_data_np, dev_label_np, dev_data_np,
              test_label_np, test_data_np):
-    #this takes numpy array training data and return: height, width, train_size, dev_size, test_size,categories, category_num
+    # this takes numpy array training data and return: height, width, train_size, dev_size, test_size,categories, category_num
     import numpy as np
     train_size, height, width, channel = np.shape(train_data_np)
 
@@ -162,32 +15,28 @@ def describe(train_label_np, train_data_np, dev_label_np, dev_data_np,
     return height, width, channel, train_size, dev_size, test_size, categories, category_num
 
 
-## Main Program go here
-
-### Part 1: extract first digit data (Normal or abnormal)
+# Part 1: extract first digit data (Normal or abnormal)
 
 # define the paths to training, development, and test sets
 mypath_train = "./data/train"
 mypath_dev = "./data/dev"
 mypath_test = "./data/test"
 
-# call to load images into initial arrays,
-#the data file digits preceding the "-" are the label, for instance filename_label_position=0,
-# means the position 0 (first digit) is the label of interest
-#in our dataset, first digit is normal (=0), vs abnormal (=1)
-# second digit is which artery (0=left main, 1=LAD, 2= LCx, 3= RCA)
-#the picture is converted to dimenston height/difeth set below, using CV2)
-train_labels, train_data, dev_labels, dev_data, test_labels, test_data = imageload(
-    mypath_train,
-    mypath_dev,
-    mypath_test,
-    filename_label_position=0,
-    dimheight=128,
-    dimwidth=128)
 
-#numparize the array
-train_label_np, train_data_np, dev_label_np, dev_data_np, test_label_np, test_data_np = numparize(
-    train_labels, train_data, dev_labels, dev_data, test_labels, test_data)
+# call to load images into initial arrays,
+# the data file digits preceding the "-" are the label, for instance filename_label_position=0,
+# means the position 0 (first digit) is the label of interest
+# in our dataset, first digit is normal (=0), vs abnormal (=1)
+# second digit is which artery (0=left main, 1=LAD, 2= LCx, 3= RCA)
+# the picture is converted to dimenston height/difeth set below, using CV2)
+train_labels, train_data = imageload(mypath_train)
+dev_labels, dev_data = imageload(mypath_dev)
+test_labels, test_data = imageload(mypath_test)
+
+# numparize the array
+train_label_np, train_data_np = numparize(train_labels, train_data)
+dev_label_np, dev_data_np = numparize(dev_labels, dev_data)
+test_label_np, test_data_np = numparize(test_labels, test_data)
 
 # Describe the data
 height, width, channel, train_size, dev_size, test_size, categories, category_num = describe(
@@ -203,22 +52,22 @@ print("number of category=", category_num)
 
 print("------------")
 
-## connecting to Keras below
+# connecting to Keras below
 
-### Data extraction Part 2: extract first digit data (Left main or LAD or LCx or RCA)
+# Data extraction Part 2: extract first digit data (Left main or LAD or LCx or RCA)
+train_labels1, train_data1 = imageload(
+    mypath_train, filename_label_position=1, dimheight=64,  dimwidth=64)
+dev_labels1, dev_data1 = imageload(
+    mypath_dev, filename_label_position=1, dimheight=64,  dimwidth=64)
+test_labels1, test_data1 = imageload(
+    mypath_test, filename_label_position=1, dimheight=64,  dimwidth=64)
 
-train_labels1, train_data1, dev_labels1, dev_data1, test_labels1, test_data1 = imageload(
-    mypath_train,
-    mypath_dev,
-    mypath_test,
-    filename_label_position=1,
-    dimheight=64,
-    dimwidth=64)
+# numparize the array
 
-#numparize the array
-train_label_np1, train_data_np1, dev_label_np1, dev_data_np1, test_label_np1, test_data_np1 = numparize(
-    train_labels1, train_data1, dev_labels1, dev_data1, test_labels1,
-    test_data1)
+train_label_np1, train_data_np1 = numparize(train_labels1, train_data1)
+dev_label_np1, dev_data_np1 = numparize(dev_labels1, dev_data1)
+test_label_np1, test_data_np1 = numparize(test_labels1, test_data1)
+
 
 # Describe the data
 height1, width1, channel1, train_size1, dev_size1, test_size1, categories1, category_num1 = describe(
@@ -274,10 +123,10 @@ train_label_shape = np.shape(
 train_label1_shape = np.shape(train_labels1)
 oneshot_column_merged = (
     train_label_shape[1] -
-    1) + train_label1_shape[1]  #so how many columns do we need in tatpe
+    1) + train_label1_shape[1]  # so how many columns do we need in tatpe
 sample_size = train_label_shape[0]  # sample size
 train_labels_merged = np.zeros(
-    (sample_size, oneshot_column_merged))  #create new numpy array of 0
+    (sample_size, oneshot_column_merged))  # create new numpy array of 0
 
 train_labels_merged[0:sample_size, 0:(
     train_label_shape[1] - 1)] = train_labels[0:sample_size, 1].reshape(
@@ -290,10 +139,10 @@ dev_label_shape = np.shape(dev_labels)  # describe the train-label and label-1
 dev_label1_shape = np.shape(dev_labels1)
 oneshot_column_merged = (
     dev_label_shape[1] -
-    1) + dev_label1_shape[1]  #so how many columns do we need in tatpe
+    1) + dev_label1_shape[1]  # so how many columns do we need in tatpe
 sample_size = dev_label_shape[0]  # sample size
 dev_labels_merged = np.zeros(
-    (sample_size, oneshot_column_merged))  #create new numpy array of 0
+    (sample_size, oneshot_column_merged))  # create new numpy array of 0
 
 dev_labels_merged[0:sample_size, 0:(
     dev_label_shape[1] - 1)] = dev_labels[0:sample_size, 1].reshape(
@@ -307,10 +156,10 @@ test_label_shape = np.shape(
 test_label1_shape = np.shape(test_labels1)
 oneshot_column_merged = (
     test_label_shape[1] -
-    1) + test_label1_shape[1]  #so how many columns do we need in tatpe
+    1) + test_label1_shape[1]  # so how many columns do we need in tatpe
 sample_size = test_label_shape[0]  # sample size
 test_labels_merged = np.zeros(
-    (sample_size, oneshot_column_merged))  #create new numpy array of 0
+    (sample_size, oneshot_column_merged))  # create new numpy array of 0
 
 test_labels_merged[0:sample_size, 0:(
     test_label_shape[1] - 1)] = test_labels[0:sample_size, 1].reshape(
@@ -390,12 +239,12 @@ plt.legend()
 
 plt.show()
 
-#validation of small network
+# validation of small network
 test_loss, test_acc = model.evaluate(
     x=test_images, y=test_labels_merged, batch_size=None, verbose=1)
 print('test_accuracy for test set:', test_acc)
 
-#print test images and results using matplotlib
+# print test images and results using matplotlib
 
 import numpy as np
 import cv2
@@ -418,7 +267,7 @@ for i in range(test_data_np.shape[0]):
     print(prediction_row)
 
     cad = int(prediction_row[0] > 0.5)  # this is specific for one shot
-    anatomy = np.argmax(prediction_row[1:5])  #this is specific for one shot
+    anatomy = np.argmax(prediction_row[1:5])  # this is specific for one shot
 
     if (cad == int(test_label_np[i])):
         counter_stenosis = counter_stenosis + 1
