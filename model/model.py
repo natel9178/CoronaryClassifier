@@ -23,7 +23,6 @@ def build_model(is_training, params):
     model = models.Sequential()
     model.add(dense_net)
     model.add(layers.Flatten())
-    model.add(layers.Dropout(0.5))
     model.add(layers.Dense(5, activation='sigmoid'))
 
     # Below freeze all the the VGG16 as untrainable except the last few layers. Look at structure of the VGG16 listed above
