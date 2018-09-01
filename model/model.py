@@ -12,45 +12,39 @@ from keras import regularizers
 
 def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
-    # conv_base = VGG16(weights='imagenet', include_top=False,
-    #                   input_shape=(height, width, channel))
+    x = layers.Input(shape=(height, width, channel), name='main_input')
 
     dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
-        height, width, channel), pooling=None)
+        height, width, channel), pooling=None)(x)
 
     # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
+    flatten = layers.Flatten()(dense_net)
+    bin_stenosis = layers.Dense(10, activation='relu')(flatten)
+    bin_stenosis = layers.Dense(
+        1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
-    model = models.Sequential()
-    model.add(dense_net)
-    model.add(layers.Flatten())
-    model.add(layers.Dense(5, activation='sigmoid'))
+    anatomy = layers.Dense(20, activation='relu')(flatten)
+    anatomy = layers.Dense(4, activation='softmax',
+                           name='anatomy_output')(anatomy)
 
-    # Below freeze all the the VGG16 as untrainable except the last few layers. Look at structure of the VGG16 listed above
-
-    # conv_base.trainable=True
-    # set_trainable=False
-    # for layer in conv_base.layers:
-    #     if layer.name == 'block5_conv1':
-    #         set_trainable=True
-    #     layer.trainable=set_trainable
+    model = models.Model(inputs=[x], outputs=[bin_stenosis,
+                                              anatomy])
     print(model.summary())
     return model
 
 
-def train_model(model, train_labels, train_data, val_labels, val_data, epochs=30, batch_size=16):
+def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=30, batch_size=16):
     INIT_LR = 0.0001
     adam = optimizers.Adam(lr=INIT_LR)
-    model.compile(optimizer=adam, loss='binary_crossentropy',
+    model.compile(optimizer=adam, loss={'stenosis_output': 'binary_crossentropy', 'anatomy_output': 'categorical_crossentropy'},
                   metrics=['accuracy'])
-    print("dimension of train_images, train_labels,dev_images, dev_labels")
-    print(train_data.shape, train_labels.shape, val_data.shape,
-          val_labels.shape)
     history = model.fit(
-        train_data,
-        train_labels,
+        {'main_input': train_data},
+        {'stenosis_output': train_labels_stenosis,
+            'anatomy_output': train_labels_anatomy},
         epochs=epochs,
         batch_size=batch_size,
-        validation_data=(val_data, val_labels))
+        validation_data=(val_data, {'stenosis_output': val_labels_stenosis, 'anatomy_output': val_labels_anatomy}))
 
     # save the pareameter of the model
     model.save('PL_CV_engine2.h5')
