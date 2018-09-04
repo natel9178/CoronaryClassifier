@@ -50,7 +50,7 @@ def build_model(is_training, params):
 
 
 def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=30, batch_size=16):
-    INIT_LR = 0.001
+    INIT_LR = 0.0001
     adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
