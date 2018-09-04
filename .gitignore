@@ -1,5 +1,6 @@
 data/*
 .vscode
+**/*.h5
 
 # Created by https://www.gitignore.io/api/python
 
