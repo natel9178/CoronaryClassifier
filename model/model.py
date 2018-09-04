@@ -9,6 +9,13 @@ from keras import models
 from keras import layers
 from keras import optimizers
 from keras import regularizers
+import os
+import sys
+import time
+from keras.callbacks import TensorBoard, ModelCheckpoint
+
+ADDTNL_TBOARD_TEXT = 'densenet'
+TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
 def build_model(is_training, params):
@@ -49,7 +56,17 @@ def build_model(is_training, params):
     return model
 
 
+def get_model_name(epochs):
+    return "epochs_{}_{}_{}".format(
+        epochs, ADDTNL_TBOARD_TEXT, strftime("%Y-%m-%d_%H-%M-%S", localtime()))
+
+
 def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=30, batch_size=16):
+    MODEL_FINAL_DIR = '{}{}{}'.format(
+        'experiments/weights/', get_model_name(epochs), '_weights.final.hdf5')
+    MODEL_CP_DIR = '{}{}{}'.format(
+        'experiments/weights/', get_model_name(epochs), '_weights.chkpt.hdf5')
+
     INIT_LR = 0.0001
     adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
@@ -57,15 +74,20 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
                         'anatomy_output': 'categorical_crossentropy'},
                   loss_weights={'stenosis_output': 2., 'anatomy_output': 1.},
                   metrics=['accuracy'])
+    tensorboard = TensorBoard(log_dir=os.path.join(
+        TENSORBOARD_BASE_DIR, get_model_name(epochs)))
+    checkpoint = ModelCheckpoint(
+        MODEL_CP_DIR, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+
     history = model.fit(
         {'main_input': train_data},
         {'stenosis_output': train_labels_stenosis,
             'anatomy_output': train_labels_anatomy},
         epochs=epochs,
         batch_size=batch_size,
-        validation_data=(val_data, {'stenosis_output': val_labels_stenosis, 'anatomy_output': val_labels_anatomy}))
+        validation_data=(val_data, {'stenosis_output': val_labels_stenosis, 'anatomy_output': val_labels_anatomy}), callbacks=[tensorboard, checkpoint])
 
     # save the pareameter of the model
-    model.save('PL_CV_engine2.h5')
+    model.save(MODEL_FINAL_DIR)
 
     return history
