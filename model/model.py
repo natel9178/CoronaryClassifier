@@ -3,6 +3,7 @@
 import tensorflow as tf
 from keras.applications import VGG16
 from keras.applications import densenet
+from keras.applications import inception_resnet_v2
 from keras.utils import to_categorical
 from keras.utils import plot_model
 from keras import models
@@ -15,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint
 
-ADDTNL_TBOARD_TEXT = 'densenet'
+ADDTNL_TBOARD_TEXT = 'inceptionresnet'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -23,8 +24,12 @@ def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
     x = layers.Input(shape=(height, width, channel), name='main_input')
 
-    dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
-        height, width, channel), pooling=None)(x)
+    inception_res_net = inception_resnet_v2.InceptionResNetV2(
+        include_top=False, weights='imagenet', input_shape=(height, width, channel), pooling=None)(x)
+
+    # dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
+    #     height, width, channel), pooling=None)(x)
+
     # vgg_net = VGG16(weights='imagenet', include_top=False)
     # vgg_net.trainable = True
     # set_trainable = False
