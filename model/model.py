@@ -15,19 +15,19 @@ def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
     x = layers.Input(shape=(height, width, channel), name='main_input')
 
-    # dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
-    #     height, width, channel), pooling=None)(x)
-    vgg_net = VGG16(weights='imagenet', include_top=False)
-    vgg_net.trainable = True
-    set_trainable = False
-    for layer in vgg_net.layers:
-        if layer.name == 'block5_conv1':
-            set_trainable = True
-        layer.trainable = set_trainable
-    vgg_net = vgg_net(x)
+    dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
+        height, width, channel), pooling=None)(x)
+    # vgg_net = VGG16(weights='imagenet', include_top=False)
+    # vgg_net.trainable = True
+    # set_trainable = False
+    # for layer in vgg_net.layers:
+    #     if layer.name == 'block5_conv1':
+    #         set_trainable = True
+    #     layer.trainable = set_trainable
+    # vgg_net = vgg_net(x)
 
     # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
-    flatten = layers.Flatten()(vgg_net)
+    flatten = layers.Flatten()(dense_net)
     dropout = layers.Dropout(0.5)(flatten)
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
@@ -50,8 +50,8 @@ def build_model(is_training, params):
 
 
 def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=30, batch_size=16):
-    INIT_LR = 0.1
-    adam = optimizers.Adam(lr=INIT_LR, decay=1e-6)
+    INIT_LR = 0.0001
+    adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
                         'anatomy_output': 'categorical_crossentropy'},
