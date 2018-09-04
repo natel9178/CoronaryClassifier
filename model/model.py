@@ -40,7 +40,7 @@ def build_model(is_training, params):
     # vgg_net = vgg_net(x)
 
     # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
-    flatten = layers.Flatten()(dense_net)
+    flatten = layers.Flatten()(inception_res_net)
     dropout = layers.Dropout(0.5)(flatten)
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
