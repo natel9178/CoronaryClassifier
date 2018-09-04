@@ -45,7 +45,7 @@ def build_model(is_training, params):
     model = models.Model(inputs=[x], outputs=[bin_stenosis,
                                               anatomy])
     print(model.summary())
-    plot_model(model, to_file='model.png')
+    # plot_model(model, to_file='model.png')
     return model
 
 
