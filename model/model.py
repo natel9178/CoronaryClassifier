@@ -12,6 +12,7 @@ from keras import regularizers
 import os
 import sys
 import time
+from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint
 
 ADDTNL_TBOARD_TEXT = 'densenet'
@@ -61,7 +62,7 @@ def get_model_name(epochs):
         epochs, ADDTNL_TBOARD_TEXT, strftime("%Y-%m-%d_%H-%M-%S", localtime()))
 
 
-def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=30, batch_size=16):
+def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=100, batch_size=16):
     MODEL_FINAL_DIR = '{}{}{}'.format(
         'experiments/weights/', get_model_name(epochs), '_weights.final.hdf5')
     MODEL_CP_DIR = '{}{}{}'.format(
