@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint
 
-ADDTNL_TBOARD_TEXT = 'inceptionresnet'
+ADDTNL_TBOARD_TEXT = 'quickverify'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -24,8 +24,8 @@ def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
     x = layers.Input(shape=(height, width, channel), name='main_input')
 
-    inception_res_net = inception_resnet_v2.InceptionResNetV2(
-        include_top=False, weights='imagenet', input_shape=(height, width, channel), pooling=None)(x)
+    # inception_resnet_v2.InceptionResNetV2(include_top=False, weights='imagenet', input_shape=(height, width, channel), pooling=None)(x)
+    inception_res_net = x
 
     # dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
     #     height, width, channel), pooling=None)(x)
@@ -67,7 +67,8 @@ def get_model_name(epochs):
         epochs, ADDTNL_TBOARD_TEXT, strftime("%Y-%m-%d_%H-%M-%S", localtime()))
 
 
-def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=100, batch_size=16):
+def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=1, batch_size=16):
+
     MODEL_FINAL_DIR = '{}{}{}'.format(
         'experiments/weights/', get_model_name(epochs), '_weights.final.hdf5')
     MODEL_CP_DIR = '{}{}{}'.format(
@@ -83,7 +84,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     tensorboard = TensorBoard(log_dir=os.path.join(
         TENSORBOARD_BASE_DIR, get_model_name(epochs)))
     checkpoint = ModelCheckpoint(
-        MODEL_CP_DIR, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+        MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
 
     history = model.fit(
         {'main_input': train_data},

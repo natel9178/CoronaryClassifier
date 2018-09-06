@@ -97,6 +97,6 @@ if __name__ == '__main__':
                           train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
 
     # print the graph of learning history for diagnostic purpose.
-    print_plot_keras_metrics(history)
-    eval_model(model, dev_labels_stenosis, dev_data, dev_label_np_stenosis,
-               dev_data_np, dev_label_np_anatomy, dev_data_np1)
+    # print_plot_keras_metrics(history)
+    # eval_model(model, dev_labels_stenosis, dev_data, dev_label_np_stenosis,
+    #            dev_data_np, dev_label_np_anatomy, dev_data_np1)
