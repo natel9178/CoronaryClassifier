@@ -98,7 +98,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     return history
 
 
-def train_model_with_generators(model, train_flow, val_flow, epochs=1):
+def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per_epoch=50, validation_steps=50):
 
     MODEL_FINAL_DIR = '{}{}{}'.format(
         'experiments/weights/', get_model_name(epochs), '_weights.final.hdf5')
