@@ -70,7 +70,7 @@ def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, v
     val_flow_data = (val_data, val_y)
 
     train_flow = train_datagen.flow(train_flow_data,
-                                    batch_size=batch_size, shuffle=True, seed=seed, save_to_dir='preview', save_prefix='gen', save_format='jpeg')
+                                    batch_size=batch_size, shuffle=True, seed=seed)
     val_flow = val_datagen.flow(val_flow_data, batch_size=batch_size,
                                 shuffle=True, seed=seed)
 
