@@ -135,7 +135,7 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
         model.load_weights(model_weight_filename, by_name=True)
 
     history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=steps_per_epoch, validation_data=val_flow,
-                                  validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce], initial_epoch=starting_epoch)
+                                  validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce], initial_epoch=int(starting_epoch))
 
     # save the pareameter of the model
     model.save(MODEL_FINAL_DIR)
