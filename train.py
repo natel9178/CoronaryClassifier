@@ -74,9 +74,7 @@ if __name__ == '__main__':
     # flatten the image and ensure it can go into Keras properly
     # notice the name is different from train_data.
     train_images = train_data_np.reshape((train_size, height, width, channel))
-    train_images = train_images.astype('float32') / 255
     dev_images = dev_data_np.reshape((dev_size, height, width, channel))
-    dev_images = dev_images.astype('float32') / 255
 
     sample_size = dev_images.shape[0]  # sample size
 
