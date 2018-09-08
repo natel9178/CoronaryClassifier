@@ -9,9 +9,9 @@ import tensorflow as tf
 
 from model.utils import Params, set_logger, save_dict_to_json
 import numpy as np
-from model.input import imageload, merge_labels
+from model.input import imageload, merge_labels, expose_generators, generator_hotfix
 from model.modelutils import numparize, describe
-from model.model import build_model, train_model
+from model.model import build_model, train_model, train_model_with_generators
 from model.evaluate import print_plot_keras_metrics, eval_model
 from keras.applications import VGG16
 from keras.utils import to_categorical
@@ -78,23 +78,25 @@ if __name__ == '__main__':
     dev_images = dev_data_np.reshape((dev_size, height, width, channel))
     dev_images = dev_images.astype('float32') / 255
 
-    # train_labels_merged = merge_labels(
-    #     train_labels_stenosis, train_labels_anatomy)
-    # dev_labels_merged = merge_labels(dev_labels_stenosis, dev_labels_anatomy)
-
     sample_size = dev_images.shape[0]  # sample size
 
-    for i in range(sample_size):
-        print(dev_label_np_stenosis[i], ",", dev_labels_anatomy_cat[i])
+    # for i in range(sample_size):
+    #     print(dev_label_np_stenosis[i], ",", dev_labels_anatomy_cat[i])
+
+    train_flow, val_flow = expose_generators(
+        train_images, train_label_np_stenosis, train_labels_anatomy_cat, dev_images, dev_label_np_stenosis, dev_labels_anatomy_cat)
+
+    train_flow_hf = generator_hotfix(train_flow)
+    val_flow_hf = generator_hotfix(val_flow)
 
     params = {}
     params['height'] = height
     params['width'] = width
     params['channel'] = channel
-
     model = build_model(is_training=True, params=params)
-    history = train_model(model, train_label_np_stenosis, train_labels_anatomy_cat,
-                          train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
+    # history = train_model(model, train_label_np_stenosis, train_labels_anatomy_cat, train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
+    history = train_model_with_generators(
+        model, train_flow_hf, val_flow_hf, epochs=1)
 
     # print the graph of learning history for diagnostic purpose.
     # print_plot_keras_metrics(history)
