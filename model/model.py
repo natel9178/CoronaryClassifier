@@ -24,11 +24,10 @@ def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
     x = layers.Input(shape=(height, width, channel), name='main_input')
 
-    # inception_resnet_v2.InceptionResNetV2(include_top=False, weights='imagenet', input_shape=(height, width, channel), pooling=None)(x)
-    inception_res_net = x
+    # inception_res_net = inception_resnet_v2.InceptionResNetV2(include_top=False, weights='imagenet', input_shape=(height, width, channel), pooling=None)(x)
 
-    # dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
-    #     height, width, channel), pooling=None)(x)
+    dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
+        height, width, channel), pooling=None)(x)
 
     # vgg_net = VGG16(weights='imagenet', include_top=False)
     # vgg_net.trainable = True
@@ -40,7 +39,7 @@ def build_model(is_training, params):
     # vgg_net = vgg_net(x)
 
     # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
-    flatten = layers.Flatten()(inception_res_net)
+    flatten = layers.Flatten()(dense_net)
     dropout = layers.Dropout(0.5)(flatten)
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
