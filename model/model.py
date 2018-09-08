@@ -44,11 +44,11 @@ def build_model(is_training, params):
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
     bin_stenosis = layers.Dense(
-        64, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
+        64, activation='relu', kernel_regularizer=regularizers.l2(0.02))(batch_norm)
     bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
     bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
     bin_stenosis = layers.Dense(
-        10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
+        10, activation='relu', kernel_regularizer=regularizers.l2(0.02))(bin_stenosis)
     bin_stenosis = layers.Dense(
         1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
