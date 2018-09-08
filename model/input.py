@@ -50,17 +50,18 @@ def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth
 
 
 def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, val_data, val_labels_stenosis, val_labels_anatomy, batch_size=32):
+    shift = 0.2
     train_datagen = ImageDataGenerator(
         rescale=1./255,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True)
+        rotation_range=30,
+        zoom_range=0.2, width_shift_range=shift, height_shift_range=shift)
 
     val_datagen = ImageDataGenerator(rescale=1./255)
 
     seed = 1
-    # train_datagen.fit(train_data, augment=True, seed=seed)
-    # val_datagen.fit(val_data, augment=True, seed=seed)
+    train_datagen.fit(train_data, augment=True, seed=seed)
+    val_datagen.fit(val_data, augment=True, seed=seed)
+
     print(train_labels_stenosis.shape)
     print(train_labels_anatomy.shape)
     train_y = [train_labels_stenosis, train_labels_anatomy]
@@ -69,14 +70,9 @@ def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, v
     val_flow_data = (val_data, val_y)
 
     train_flow = train_datagen.flow(train_flow_data,
-                                    batch_size=batch_size, shuffle=True, seed=seed)
+                                    batch_size=batch_size, shuffle=True, seed=seed, save_to_dir='preview', save_prefix='gen', save_format='jpeg')
     val_flow = val_datagen.flow(val_flow_data, batch_size=batch_size,
                                 shuffle=True, seed=seed)
-
-    next = train_flow.next()
-    print(next[0].shape)
-    print(next[1].shape)
-    print(next[2].shape)
 
     return train_flow, val_flow
 
