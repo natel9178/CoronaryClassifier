@@ -95,7 +95,7 @@ if __name__ == '__main__':
     model = build_model(is_training=True, params=params)
     # history = train_model(model, train_label_np_stenosis, train_labels_anatomy_cat, train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
     history = train_model_with_generators(
-        model, train_flow_hf, val_flow_hf, epochs=100, steps_per_epoch=len(train_images)/BATCH_SIZE, validation_steps=len(dev_images)/BATCH_SIZE)
+        model, train_flow_hf, val_flow_hf, epochs=200, steps_per_epoch=len(train_images)/BATCH_SIZE * 2, validation_steps=len(dev_images)/BATCH_SIZE * 2)
 
     # print the graph of learning history for diagnostic purpose.
     # print_plot_keras_metrics(history)

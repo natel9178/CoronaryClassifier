@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'preprocess_testing'
+ADDTNL_TBOARD_TEXT = 'preprocess_testing_with_regularization_loss'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -43,10 +43,12 @@ def build_model(is_training, params):
     dropout = layers.Dropout(0.5)(flatten)
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
-    bin_stenosis = layers.Dense(64, activation='relu')(batch_norm)
+    bin_stenosis = layers.Dense(
+        64, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
     bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
     bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
-    bin_stenosis = layers.Dense(10, activation='relu')(bin_stenosis)
+    bin_stenosis = layers.Dense(
+        10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
     bin_stenosis = layers.Dense(
         1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
@@ -85,7 +87,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
     lr_reduce = ReduceLROnPlateau(
-        monitor='val_stenosis_output_acc', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
 
     history = model.fit(
         {'main_input': train_data},
@@ -119,7 +121,7 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
     lr_reduce = ReduceLROnPlateau(
-        monitor='val_stenosis_output_acc', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
 
     history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=steps_per_epoch,
                                   validation_data=val_flow, validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce])
