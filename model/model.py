@@ -63,9 +63,13 @@ def build_model(is_training, params):
     return model
 
 
+def get_current_time_string():
+    return strftime("%Y-%m-%d_%H-%M-%S", localtime())
+
+
 def get_model_name(epochs):
     return "epochs_{}_{}_{}".format(
-        epochs, ADDTNL_TBOARD_TEXT, strftime("%Y-%m-%d_%H-%M-%S", localtime()))
+        epochs, ADDTNL_TBOARD_TEXT, get_current_time_string())
 
 
 def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, val_labels_stenosis, val_labels_anatomy, val_data, epochs=1, batch_size=16):
@@ -102,14 +106,18 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     return history
 
 
-def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per_epoch=50, validation_steps=50):
-
+def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per_epoch=50, validation_steps=50, model_weight_filename=None, starting_epoch=0):
+    COMMON_WEIGHT_DIR = 'experiments/weights/'
     MODEL_FINAL_DIR = '{}{}{}'.format(
-        'experiments/weights/', get_model_name(epochs), '_weights.final.hdf5')
+        COMMON_WEIGHT_DIR, get_model_name(epochs), '_weights.final.hdf5')
     MODEL_CP_DIR = '{}{}{}'.format(
-        'experiments/weights/', get_model_name(epochs), '_weights.chkpt.hdf5')
+        COMMON_WEIGHT_DIR, get_model_name(epochs), '_weights.chkpt.hdf5')
+    if model_weight_filename != None:
+        MODEL_CP_DIR.replace('_weights.chkpt.hdf5', '')
+        MODEL_CP_DIR = '{}{}{}{}'.format(
+            MODEL_CP_DIR, '_resume_',  get_current_time_string(), '_weights.chkpt.hdf5')
 
-    INIT_LR = 0.001
+    INIT_LR = 0.000005  # 0.001
     adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
@@ -121,10 +129,13 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
     lr_reduce = ReduceLROnPlateau(
-        monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.0000001, verbose=1)
 
-    history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=steps_per_epoch,
-                                  validation_data=val_flow, validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce])
+    if model_weight_filename != None:
+        model.load_weights(model_weight_filename, by_name=True)
+
+    history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=steps_per_epoch, validation_data=val_flow,
+                                  validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce], initial_epoch=starting_epoch)
 
     # save the pareameter of the model
     model.save(MODEL_FINAL_DIR)

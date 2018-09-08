@@ -25,6 +25,8 @@ parser.add_argument('--data_dir', default='data',
                     help="Directory containing the dataset")
 parser.add_argument('--restore_from', default=None,
                     help="Optional, directory or file containing weights to reload before training")
+parser.add_argument('--starting_epoch', default=0,
+                    help="Optional, starting epoch for retrainint")
 
 
 if __name__ == '__main__':
@@ -95,7 +97,7 @@ if __name__ == '__main__':
     model = build_model(is_training=True, params=params)
     # history = train_model(model, train_label_np_stenosis, train_labels_anatomy_cat, train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
     history = train_model_with_generators(
-        model, train_flow_hf, val_flow_hf, epochs=200, steps_per_epoch=len(train_images)/BATCH_SIZE * 2, validation_steps=len(dev_images)/BATCH_SIZE * 2)
+        model, train_flow_hf, val_flow_hf, epochs=200, steps_per_epoch=len(train_images)/BATCH_SIZE * 2, validation_steps=len(dev_images)/BATCH_SIZE * 2, model_weight_filename=args.restore_from, starting_epoch=args.starting_epoch)
 
     # print the graph of learning history for diagnostic purpose.
     # print_plot_keras_metrics(history)
