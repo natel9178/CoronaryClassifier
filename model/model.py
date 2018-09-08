@@ -14,7 +14,7 @@ import os
 import sys
 import time
 from time import localtime, strftime
-from keras.callbacks import TensorBoard, ModelCheckpoint
+from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
 ADDTNL_TBOARD_TEXT = 'preprocess_testing'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
@@ -84,6 +84,8 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
         TENSORBOARD_BASE_DIR, get_model_name(epochs)))
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
+    lr_reduce = ReduceLROnPlateau(
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.0001)
 
     history = model.fit(
         {'main_input': train_data},
@@ -105,7 +107,7 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
     MODEL_CP_DIR = '{}{}{}'.format(
         'experiments/weights/', get_model_name(epochs), '_weights.chkpt.hdf5')
 
-    INIT_LR = 0.0001
+    INIT_LR = 0.01
     adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
@@ -117,8 +119,8 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
 
-    history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=2000,
-                                  validation_data=val_flow, validation_steps=2000, callbacks=[tensorboard, checkpoint])
+    history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=steps_per_epoch,
+                                  validation_data=val_flow, validation_steps=validation_steps, callbacks=[tensorboard, checkpoint])
 
     # save the pareameter of the model
     model.save(MODEL_FINAL_DIR)
