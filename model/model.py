@@ -73,7 +73,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     MODEL_CP_DIR = '{}{}{}'.format(
         'experiments/weights/', get_model_name(epochs), '_weights.chkpt.hdf5')
 
-    INIT_LR = 0.0001
+    INIT_LR = 0.01
     adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
@@ -85,14 +85,14 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
     lr_reduce = ReduceLROnPlateau(
-        monitor='val_loss', factor=0.5, patience=5, min_lr=0.0001)
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.0001, verbose=1)
 
     history = model.fit(
         {'main_input': train_data},
         [train_labels_stenosis, train_labels_anatomy],
         epochs=epochs,
         batch_size=batch_size,
-        validation_data=(val_data, [val_labels_stenosis, val_labels_anatomy]), callbacks=[tensorboard, checkpoint])
+        validation_data=(val_data, [val_labels_stenosis, val_labels_anatomy]), callbacks=[tensorboard, checkpoint, lr_reduce])
 
     # save the pareameter of the model
     model.save(MODEL_FINAL_DIR)
@@ -118,9 +118,11 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
         TENSORBOARD_BASE_DIR, get_model_name(epochs)))
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
+    lr_reduce = ReduceLROnPlateau(
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.0001, verbose=1)
 
     history = model.fit_generator(train_flow, epochs=epochs, steps_per_epoch=steps_per_epoch,
-                                  validation_data=val_flow, validation_steps=validation_steps, callbacks=[tensorboard, checkpoint])
+                                  validation_data=val_flow, validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce])
 
     # save the pareameter of the model
     model.save(MODEL_FINAL_DIR)
