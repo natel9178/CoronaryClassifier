@@ -45,9 +45,16 @@ if __name__ == '__main__':
 
     # numparize the array
     train_label_np_stenosis = numparize_labels(train_labels_stenosis)
+    del train_labels_stenosis
+
     train_data_np = numparize_data(train_data)
+    del train_data
+
     dev_label_np_stenosis = numparize_labels(dev_labels_stenosis)
+    del dev_labels_stenosis
+
     dev_data_np = numparize_data(dev_data)
+    del dev_data
 
     # Describe the data
     height, width, channel, train_size, dev_size, _, _ = describe(
@@ -71,6 +78,8 @@ if __name__ == '__main__':
     # Describe the data
     describe(train_label_np_anatomy, train_data_np,
              dev_label_np_anatomy, dev_data_np)
+    del train_label_np_anatomy
+    del dev_label_np_anatomy
 
     # flatten the image and ensure it can go into Keras properly
     # notice the name is different from train_data.
