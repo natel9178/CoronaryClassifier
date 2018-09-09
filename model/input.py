@@ -60,8 +60,8 @@ def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, v
     val_datagen = ImageDataGenerator(rescale=1./255)
 
     seed = 1
-    train_datagen.fit(train_data, augment=True, seed=seed)
-    val_datagen.fit(val_data, augment=True, seed=seed)
+    # train_datagen.fit(train_data, augment=True, seed=seed)
+    # val_datagen.fit(val_data, augment=True, seed=seed)
 
     print(train_labels_stenosis.shape)
     print(train_labels_anatomy.shape)
