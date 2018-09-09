@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'preprocess_testing_with_regularization_loss'
+ADDTNL_TBOARD_TEXT = 'dense_large_reg_loss'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
