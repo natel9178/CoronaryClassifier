@@ -1,0 +1,2 @@
+/var/spool/slurmd/job1241305/slurm_script: line 3: 22787 Killed                  python3 train.py
+slurmstepd: error: Detected 1 oom-kill event(s) in step 1241305.batch cgroup.
