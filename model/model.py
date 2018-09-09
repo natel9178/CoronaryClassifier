@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densenet_regularize_0.01'
+ADDTNL_TBOARD_TEXT = 'datav2_densenet_regularize_sten_0.03_anat_0.01'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -44,15 +44,16 @@ def build_model(is_training, params):
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
     bin_stenosis = layers.Dense(
-        64, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
+        64, activation='relu', kernel_regularizer=regularizers.l2(0.03))(batch_norm)
     bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
     bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
     bin_stenosis = layers.Dense(
-        10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
+        10, activation='relu', kernel_regularizer=regularizers.l2(0.03))(bin_stenosis)
     bin_stenosis = layers.Dense(
         1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
-    anatomy = layers.Dense(20, activation='relu')(batch_norm)
+    anatomy = layers.Dense(20, activation='relu',
+                           kernel_regularizer=regularizers.l2(0.01))(batch_norm)
     anatomy = layers.Dense(4, activation='softmax',
                            name='anatomy_output')(anatomy)
 
@@ -106,7 +107,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     return history
 
 
-def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per_epoch=50, validation_steps=50, model_weight_filename=None, starting_epoch=0):
+def train_model_with_generators(model, train_flow, val_flow, epochs=1, lr=0.001, steps_per_epoch=50, validation_steps=50, model_weight_filename=None, starting_epoch=0):
     COMMON_WEIGHT_DIR = 'experiments/weights/'
     MODEL_FINAL_DIR = '{}{}{}'.format(
         COMMON_WEIGHT_DIR, get_model_name(epochs), '_weights.final.hdf5')
@@ -117,8 +118,7 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
         MODEL_CP_DIR = '{}{}{}{}'.format(
             MODEL_CP_DIR, '_resume_',  get_current_time_string(), '_weights.chkpt.hdf5')
 
-    INIT_LR = 0.001
-    adam = optimizers.Adam(lr=INIT_LR)
+    adam = optimizers.Adam(lr=lr)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
                         'anatomy_output': 'categorical_crossentropy'},
