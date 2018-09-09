@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'dense_datav2'
+ADDTNL_TBOARD_TEXT = 'datav2_densenet_regularize_0.01'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
