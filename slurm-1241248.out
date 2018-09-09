@@ -1,0 +1,69 @@
+2018-09-08 16:32:39.264763: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-09-08 16:32:39.421033: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1356] Found device 0 with properties: 
+name: Tesla K40c major: 3 minor: 5 memoryClockRate(GHz): 0.745
+pciBusID: 0000:82:00.0
+totalMemory: 11.17GiB freeMemory: 11.09GiB
+2018-09-08 16:32:39.421065: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0
+2018-09-08 16:32:40.701591: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-09-08 16:32:40.701636: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 
+2018-09-08 16:32:40.701644: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N 
+2018-09-08 16:32:40.701919: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10756 MB memory) -> physical GPU (device: 0, name: Tesla K40c, pci bus id: 0000:82:00.0, compute capability: 3.5)
+Using TensorFlow backend.
+Sanity Check:
+height= 224  width= 224  channel= 3
+training set size= 1726    development set size= 740
+categories= [0. 1.]
+number of category= 2
+------------
+Sanity Check:
+height= 224  width= 224  channel= 3
+training set size= 1726    development set size= 740
+categories= [0. 1. 2. 3.]
+number of category= 4
+------------
+(1726, 1)
+(1726, 4)
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+main_input (InputLayer)         (None, 224, 224, 3)  0                                            
+__________________________________________________________________________________________________
+densenet121 (Model)             (None, 7, 7, 1024)   7037504     main_input[0][0]                 
+__________________________________________________________________________________________________
+flatten_1 (Flatten)             (None, 50176)        0           densenet121[1][0]                
+__________________________________________________________________________________________________
+dropout_1 (Dropout)             (None, 50176)        0           flatten_1[0][0]                  
+__________________________________________________________________________________________________
+batch_normalization_1 (BatchNor (None, 50176)        200704      dropout_1[0][0]                  
+__________________________________________________________________________________________________
+dense_1 (Dense)                 (None, 64)           3211328     batch_normalization_1[0][0]      
+__________________________________________________________________________________________________
+dropout_2 (Dropout)             (None, 64)           0           dense_1[0][0]                    
+__________________________________________________________________________________________________
+batch_normalization_2 (BatchNor (None, 64)           256         dropout_2[0][0]                  
+__________________________________________________________________________________________________
+dense_2 (Dense)                 (None, 10)           650         batch_normalization_2[0][0]      
+__________________________________________________________________________________________________
+dense_3 (Dense)                 (None, 20)           1003540     batch_normalization_1[0][0]      
+__________________________________________________________________________________________________
+stenosis_output (Dense)         (None, 1)            11          dense_2[0][0]                    
+__________________________________________________________________________________________________
+anatomy_output (Dense)          (None, 4)            84          dense_3[0][0]                    
+==================================================================================================
+Total params: 11,454,077
+Trainable params: 11,269,949
+Non-trainable params: 184,128
+__________________________________________________________________________________________________
+None
+Traceback (most recent call last):
+  File "train.py", line 100, in <module>
+    model, train_flow_hf, val_flow_hf, epochs=200, steps_per_epoch=len(train_images)/BATCH_SIZE * 2, validation_steps=len(dev_images)/BATCH_SIZE * 2, model_weight_filename=args.restore_from, starting_epoch=args.starting_epoch)
+  File "/farmshare/user_data/natelee/coronary/CoronaryClassifier/model/model.py", line 138, in train_model_with_generators
+    validation_steps=validation_steps, callbacks=[tensorboard, checkpoint, lr_reduce], initial_epoch=starting_epoch)
+  File "/home/natelee/.local/lib/python3.5/site-packages/keras/legacy/interfaces.py", line 91, in wrapper
+    return func(*args, **kwargs)
+  File "/home/natelee/.local/lib/python3.5/site-packages/keras/engine/training.py", line 1415, in fit_generator
+    initial_epoch=initial_epoch)
+  File "/home/natelee/.local/lib/python3.5/site-packages/keras/engine/training_generator.py", line 170, in fit_generator
+    while epoch < epochs:
+TypeError: unorderable types: str() < int()
