@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'dense_large_reg_loss'
+ADDTNL_TBOARD_TEXT = 'dense_datav2'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -44,11 +44,11 @@ def build_model(is_training, params):
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
     bin_stenosis = layers.Dense(
-        64, activation='relu', kernel_regularizer=regularizers.l2(0.02))(batch_norm)
+        64, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
     bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
     bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
     bin_stenosis = layers.Dense(
-        10, activation='relu', kernel_regularizer=regularizers.l2(0.02))(bin_stenosis)
+        10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
     bin_stenosis = layers.Dense(
         1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
@@ -117,7 +117,7 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
         MODEL_CP_DIR = '{}{}{}{}'.format(
             MODEL_CP_DIR, '_resume_',  get_current_time_string(), '_weights.chkpt.hdf5')
 
-    INIT_LR = 0.000005  # 0.001
+    INIT_LR = 0.001
     adam = optimizers.Adam(lr=INIT_LR)
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
@@ -129,7 +129,7 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, steps_per
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
     lr_reduce = ReduceLROnPlateau(
-        monitor='val_loss', factor=0.5, patience=5, min_lr=0.0000001, verbose=1)
+        monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
 
     if model_weight_filename != None:
         model.load_weights(model_weight_filename, by_name=True)
