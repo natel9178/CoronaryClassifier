@@ -2,6 +2,7 @@ import os
 import cv2
 import matplotlib
 import numpy as np
+from keras.preprocessing.image import ImageDataGenerator
 
 '''
 Call to load images into initial arrays,
@@ -46,6 +47,40 @@ def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth
             i += 1
 
     return labels, data
+
+
+def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, val_data, val_labels_stenosis, val_labels_anatomy, batch_size=32):
+    shift = 0.2
+    train_datagen = ImageDataGenerator(
+        rescale=1./255,
+        rotation_range=30,
+        zoom_range=0.2, width_shift_range=shift, height_shift_range=shift)
+
+    val_datagen = ImageDataGenerator(rescale=1./255)
+
+    seed = 1
+    train_datagen.fit(train_data, augment=True, seed=seed)
+    val_datagen.fit(val_data, augment=True, seed=seed)
+
+    print(train_labels_stenosis.shape)
+    print(train_labels_anatomy.shape)
+    train_y = [train_labels_stenosis, train_labels_anatomy]
+    val_y = [val_labels_stenosis, val_labels_anatomy]
+    train_flow_data = (train_data, train_y)
+    val_flow_data = (val_data, val_y)
+
+    train_flow = train_datagen.flow(train_flow_data,
+                                    batch_size=batch_size, shuffle=True, seed=seed)
+    val_flow = val_datagen.flow(val_flow_data, batch_size=batch_size,
+                                shuffle=True, seed=seed)
+
+    return train_flow, val_flow
+
+
+def generator_hotfix(generator):
+    while True:
+        next = generator.next()
+        yield next[0], [next[1], next[2]]
 
 
 def merge_labels(binary_labels, categorical_labels):

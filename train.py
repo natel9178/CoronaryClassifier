@@ -9,9 +9,9 @@ import tensorflow as tf
 
 from model.utils import Params, set_logger, save_dict_to_json
 import numpy as np
-from model.input import imageload, merge_labels
+from model.input import imageload, merge_labels, expose_generators, generator_hotfix
 from model.modelutils import numparize, describe
-from model.model import build_model, train_model
+from model.model import build_model, train_model, train_model_with_generators
 from model.evaluate import print_plot_keras_metrics, eval_model
 from keras.applications import VGG16
 from keras.utils import to_categorical
@@ -25,6 +25,8 @@ parser.add_argument('--data_dir', default='data',
                     help="Directory containing the dataset")
 parser.add_argument('--restore_from', default=None,
                     help="Optional, directory or file containing weights to reload before training")
+parser.add_argument('--starting_epoch', default=0,
+                    help="Optional, starting epoch for retrainint")
 
 
 if __name__ == '__main__':
@@ -74,27 +76,28 @@ if __name__ == '__main__':
     # flatten the image and ensure it can go into Keras properly
     # notice the name is different from train_data.
     train_images = train_data_np.reshape((train_size, height, width, channel))
-    train_images = train_images.astype('float32') / 255
     dev_images = dev_data_np.reshape((dev_size, height, width, channel))
-    dev_images = dev_images.astype('float32') / 255
-
-    # train_labels_merged = merge_labels(
-    #     train_labels_stenosis, train_labels_anatomy)
-    # dev_labels_merged = merge_labels(dev_labels_stenosis, dev_labels_anatomy)
 
     sample_size = dev_images.shape[0]  # sample size
 
-    for i in range(sample_size):
-        print(dev_label_np_stenosis[i], ",", dev_labels_anatomy_cat[i])
+    # for i in range(sample_size):
+    #     print(dev_label_np_stenosis[i], ",", dev_labels_anatomy_cat[i])
+
+    BATCH_SIZE = 32
+    train_flow, val_flow = expose_generators(
+        train_images, train_label_np_stenosis, train_labels_anatomy_cat, dev_images, dev_label_np_stenosis, dev_labels_anatomy_cat, BATCH_SIZE)
+
+    train_flow_hf = generator_hotfix(train_flow)
+    val_flow_hf = generator_hotfix(val_flow)
 
     params = {}
     params['height'] = height
     params['width'] = width
     params['channel'] = channel
-
     model = build_model(is_training=True, params=params)
-    history = train_model(model, train_label_np_stenosis, train_labels_anatomy_cat,
-                          train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
+    # history = train_model(model, train_label_np_stenosis, train_labels_anatomy_cat, train_images, dev_label_np_stenosis, dev_labels_anatomy_cat, dev_images)
+    history = train_model_with_generators(
+        model, train_flow_hf, val_flow_hf, epochs=200, steps_per_epoch=len(train_images)/BATCH_SIZE * 2, validation_steps=len(dev_images)/BATCH_SIZE * 2, model_weight_filename=args.restore_from, starting_epoch=args.starting_epoch)
 
     # print the graph of learning history for diagnostic purpose.
     # print_plot_keras_metrics(history)
