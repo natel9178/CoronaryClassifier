@@ -16,7 +16,7 @@ import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densenet_regularize_32_sten_only'
+ADDTNL_TBOARD_TEXT = 'datav2_densenet_regularize_deeper_net'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -40,7 +40,7 @@ def build_model(is_training, params):
 
     # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
     flatten = layers.Flatten()(dense_net)
-    dropout = layers.Dropout(0.5)(flatten)
+    dropout = layers.Dropout(0.2)(flatten)
     batch_norm = layers.normalization.BatchNormalization()(dropout)
 
     bin_stenosis = layers.Dense(
@@ -48,11 +48,18 @@ def build_model(is_training, params):
     bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
     bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
     bin_stenosis = layers.Dense(
+        20, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
+    bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
+    bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
+    bin_stenosis = layers.Dense(
         10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
     bin_stenosis = layers.Dense(
         1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
-    anatomy = layers.Dense(20, activation='relu')(batch_norm)
+    anatomy = layers.Dense(20, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
+    anatomy = layers.Dropout(0.2)(anatomy)
+    anatomy = layers.normalization.BatchNormalization()(anatomy) 
+    anatomy = layers.Dense(10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
     anatomy = layers.Dense(4, activation='softmax',
                            name='anatomy_output')(anatomy)
 
