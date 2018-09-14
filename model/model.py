@@ -17,13 +17,13 @@ from time import localtime, strftime
 from .kerasdensenet import DenseNet121, DenseNet169
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densev2_try2_dense169'
+ADDTNL_TBOARD_TEXT = 'datav2_densev2_lossv2_try3_dense121'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
 def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
-    model = DenseNet169(weights='imagenet', input_shape=(
+    model = DenseNet121(weights='imagenet', input_shape=(
         height, width, channel), pooling='avg')
     # print(model.summary())
     # plot_model(model, to_file='model.png')
@@ -51,7 +51,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     model.compile(optimizer=adam,
                   loss={'stenosis_output': 'binary_crossentropy',
                         'anatomy_output': 'categorical_crossentropy'},
-                  loss_weights={'stenosis_output': 2., 'anatomy_output': 1.},
+                  loss_weights={'stenosis_output': 1., 'anatomy_output': 1.},
                   metrics=['accuracy'])
     tensorboard = TensorBoard(log_dir=os.path.join(
         TENSORBOARD_BASE_DIR, get_model_name(epochs)))
