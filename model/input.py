@@ -53,11 +53,10 @@ def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth
 def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, val_data, val_labels_stenosis, val_labels_anatomy, batch_size=32):
     shift = 0.2
     train_datagen = ImageDataGenerator(
-        rescale=1./255,
-        rotation_range=30,
+        rotation_range=20,
         zoom_range=0.2, width_shift_range=shift, height_shift_range=shift)
 
-    val_datagen = ImageDataGenerator(rescale=1./255)
+    val_datagen = ImageDataGenerator()
 
     seed = 1
     # train_datagen.fit(train_data, augment=True, seed=seed)

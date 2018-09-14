@@ -13,6 +13,7 @@ from model.input import imageload, merge_labels, expose_generators, generator_ho
 from model.modelutils import numparize_data, numparize_labels, describe
 from model.model import build_model, train_model, train_model_with_generators
 from model.evaluate import print_plot_keras_metrics, eval_model
+from model.kerasdensenet import preprocess_input
 from keras.applications import VGG16
 from keras.utils import to_categorical
 from keras import models
@@ -86,7 +87,9 @@ if __name__ == '__main__':
     # flatten the image and ensure it can go into Keras properly
     # notice the name is different from train_data.
     train_images = train_data_np.reshape((train_size, height, width, channel))
+    train_images = preprocess_input(train_images)
     dev_images = dev_data_np.reshape((dev_size, height, width, channel))
+    dev_images = preprocess_input(dev_images)
 
     sample_size = dev_images.shape[0]  # sample size
 
