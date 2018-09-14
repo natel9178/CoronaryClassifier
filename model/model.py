@@ -14,16 +14,16 @@ import os
 import sys
 import time
 from time import localtime, strftime
-from .kerasdensenet import DenseNet121
+from .kerasdensenet import DenseNet121, DenseNet169
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densev2_try1'
+ADDTNL_TBOARD_TEXT = 'datav2_densev2_try2_dense169'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
 def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
-    model = DenseNet121(weights='imagenet', input_shape=(
+    model = DenseNet169(weights='imagenet', input_shape=(
         height, width, channel), pooling='avg')
     # print(model.summary())
     # plot_model(model, to_file='model.png')
