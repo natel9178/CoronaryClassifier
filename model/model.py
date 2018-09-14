@@ -10,14 +10,13 @@ from keras import models
 from keras import layers
 from keras import optimizers
 from keras import regularizers
-from kerasdensenet import DenseNet121
 import os
 import sys
 import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densev2'
+ADDTNL_TBOARD_TEXT = 'datav2_densev2_try1'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -27,8 +26,8 @@ def build_model(is_training, params):
 
     model = DenseNet121(weights='imagenet', input_shape=(
         height, width, channel), input_tensor=x, pooling='avg')
-    print(model.summary())
-    plot_model(model, to_file='model.png')
+    # print(model.summary())
+    # plot_model(model, to_file='model.png')
     return model
 
 
