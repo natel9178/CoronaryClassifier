@@ -10,13 +10,14 @@ from keras import models
 from keras import layers
 from keras import optimizers
 from keras import regularizers
+from kerasdensenet import DenseNet121
 import os
 import sys
 import time
 from time import localtime, strftime
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densenet_regularize_deeper_net'
+ADDTNL_TBOARD_TEXT = 'datav2_densev2'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -24,49 +25,10 @@ def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
     x = layers.Input(shape=(height, width, channel), name='main_input')
 
-    # inception_res_net = inception_resnet_v2.InceptionResNetV2(include_top=False, weights='imagenet', input_shape=(height, width, channel), pooling=None)(x)
-
-    dense_net = densenet.DenseNet121(include_top=False, weights='imagenet', input_shape=(
-        height, width, channel), pooling=None)(x)
-
-    # vgg_net = VGG16(weights='imagenet', include_top=False)
-    # vgg_net.trainable = True
-    # set_trainable = False
-    # for layer in vgg_net.layers:
-    #     if layer.name == 'block5_conv1':
-    #         set_trainable = True
-    #     layer.trainable = set_trainable
-    # vgg_net = vgg_net(x)
-
-    # this code takes VGG16, and then add on a lauer of softmax to classify stuff.
-    flatten = layers.Flatten()(dense_net)
-    dropout = layers.Dropout(0.2)(flatten)
-    batch_norm = layers.normalization.BatchNormalization()(dropout)
-
-    bin_stenosis = layers.Dense(
-        32, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
-    bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
-    bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
-    bin_stenosis = layers.Dense(
-        20, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
-    bin_stenosis = layers.Dropout(0.2)(bin_stenosis)
-    bin_stenosis = layers.normalization.BatchNormalization()(bin_stenosis)
-    bin_stenosis = layers.Dense(
-        10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(bin_stenosis)
-    bin_stenosis = layers.Dense(
-        1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
-
-    anatomy = layers.Dense(20, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
-    anatomy = layers.Dropout(0.2)(anatomy)
-    anatomy = layers.normalization.BatchNormalization()(anatomy) 
-    anatomy = layers.Dense(10, activation='relu', kernel_regularizer=regularizers.l2(0.01))(batch_norm)
-    anatomy = layers.Dense(4, activation='softmax',
-                           name='anatomy_output')(anatomy)
-
-    model = models.Model(inputs=[x], outputs=[bin_stenosis,
-                                              anatomy])
+    model = DenseNet121(weights='imagenet', input_shape=(
+        height, width, channel), input_tensor=x, pooling='avg')
     print(model.summary())
-    # plot_model(model, to_file='model.png')
+    plot_model(model, to_file='model.png')
     return model
 
 
