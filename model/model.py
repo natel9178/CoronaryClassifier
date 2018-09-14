@@ -14,7 +14,7 @@ import os
 import sys
 import time
 from time import localtime, strftime
-from kerasdensenet import DenseNet121
+from .kerasdensenet import DenseNet121
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
 ADDTNL_TBOARD_TEXT = 'datav2_densev2_try1'
