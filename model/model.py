@@ -23,10 +23,8 @@ TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 def build_model(is_training, params):
     height, width, channel = params['height'], params['width'], params['channel']
-    x = layers.Input(shape=(height, width, channel), name='main_input')
-
     model = DenseNet121(weights='imagenet', input_shape=(
-        height, width, channel), input_tensor=x, pooling='avg')
+        height, width, channel), pooling='avg')
     # print(model.summary())
     # plot_model(model, to_file='model.png')
     return model
