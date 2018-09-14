@@ -7,16 +7,8 @@ assume that all images are same shape
 import numpy as np
 
 
-def numparize(labels, data):
-
-    # 1. check if label and data set have same number
-    if len(labels) != len(data):
-        print("error in data and label size")
-        exit()
-
-    # 2 obtaining size of the dictionaries in numpy arrays
-    len_labels = len(labels)  # all these sets were dictionary
-
+def numparize_data(data):
+    len_data = len(data)
     # train_data is supposed to be a dictionary of (index, numpy array of resized image).
     imageshape = np.shape(data[0])
     # we only look at the first one
@@ -24,18 +16,22 @@ def numparize(labels, data):
     height, width, channel = imageshape
     # expect color image
 
-    # 3 Initializing new numpy array
+    data_np = np.zeros((len_data, height, width, channel))
+    for i in range(len_data):
+        data_np[i, :, :, :] = data[i]
+
+    return data_np
+
+
+def numparize_labels(labels):
+    len_labels = len(labels)
     label_np = np.zeros((len_labels, 1))
 
-    data_np = np.zeros((len_labels, height, width, channel))
-
     # 4  converting data to numpy
-
     for i in range(len_labels):
-        data_np[i, :, :, :] = data[i]
         label_np[i] = labels[i]
 
-    return label_np, data_np
+    return label_np
 
 
 def describe(train_label_np, train_data_np, dev_label_np, dev_data_np):

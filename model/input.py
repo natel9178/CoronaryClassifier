@@ -14,7 +14,7 @@ the picture is converted to dimenston height/difeth set below, using CV2)
 '''
 
 
-def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth=224):
+def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth=224, ignore_image_data=False):
     labels = {}  # creat train_label and train_data dictionary
     data = {}
     filenames = set()
@@ -27,22 +27,23 @@ def imageload(data_directory, filename_label_position=0, dimheight=224, dimwidth
                 continue
 
             filenames.add(file)  # make sure file not duplicate
-            # define the path with directory
-            mypath_file = os.path.join(data_directory, file)
-            img = cv2.imread(mypath_file)  # read with OPenCV first
+            if not ignore_image_data:
+                # define the path with directory
+                mypath_file = os.path.join(data_directory, file)
+                img = cv2.imread(mypath_file)  # read with OPenCV first
 
-            # read with Open CV. note: expect color images
-            # resize with OpenCV
-            resized_img = cv2.resize(
-                img, (dimheight, dimwidth), interpolation=cv2.INTER_AREA)
+                # read with Open CV. note: expect color images
+                # resize with OpenCV
+                resized_img = cv2.resize(
+                    img, (dimheight, dimwidth), interpolation=cv2.INTER_AREA)
+                # numparize the resized image into a numpay array
+                img1 = np.array(resized_img)
+
+                # store the numpay array into a dictionary (here this is data)
+                data[i] = img1
+
             # obtain label of data (the character position is used to indicate categories)
             labels[i] = file[filename_label_position]
-
-            # numparize the resized image into a numpay array
-            img1 = np.array(resized_img)
-
-            # store the numpay array into a dictionary (here this is data)
-            data[i] = img1
 
             i += 1
 
@@ -59,8 +60,8 @@ def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, v
     val_datagen = ImageDataGenerator(rescale=1./255)
 
     seed = 1
-    train_datagen.fit(train_data, augment=True, seed=seed)
-    val_datagen.fit(val_data, augment=True, seed=seed)
+    # train_datagen.fit(train_data, augment=True, seed=seed)
+    # val_datagen.fit(val_data, augment=True, seed=seed)
 
     print(train_labels_stenosis.shape)
     print(train_labels_anatomy.shape)
@@ -73,6 +74,7 @@ def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, v
                                     batch_size=batch_size, shuffle=True, seed=seed)
     val_flow = val_datagen.flow(val_flow_data, batch_size=batch_size,
                                 shuffle=True, seed=seed)
+    print('flowed')
 
     return train_flow, val_flow
 

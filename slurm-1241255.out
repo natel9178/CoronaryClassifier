@@ -1794,3 +1794,4 @@ Epoch 155/200
  52/107 [=============>................] - ETA: 50s - loss: 0.0934 - stenosis_output_loss: 0.0120 - anatomy_output_loss: 0.0070 - stenosis_output_acc: 0.9952 - anatomy_output_acc: 0.9964slurmstepd: error: *** JOB 1241255 ON oat02 CANCELLED AT 2018-09-08T17:07:06 ***
 
  53/107 [=============>................] - ETA: 49s - loss: 0.0933 - stenosis_output_loss: 0.0120 - anatomy_output_loss: 0.0068 - stenosis_output_acc: 0.9953 - anatomy_output_acc: 0.9965
+ 54/107 [==============>...............] - ETA: 53s - loss: 0.0928 - stenosis_output_loss: 0.0118 - anatomy_output_loss: 0.0067 - stenosis_output_acc: 0.9954 - anatomy_output_acc: 0.9965
