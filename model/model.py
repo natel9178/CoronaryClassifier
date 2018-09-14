@@ -93,8 +93,11 @@ def train_model_with_generators(model, train_flow, val_flow, epochs=1, lr=0.001,
                   metrics=['accuracy'])
     tensorboard = TensorBoard(log_dir=os.path.join(
         TENSORBOARD_BASE_DIR, get_model_name(epochs)))
+    print('Will save Tensorboard to ' + os.path.join(
+        TENSORBOARD_BASE_DIR, get_model_name(epochs)))
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
+    print('Will save Checkpoints to ' + MODEL_CP_DIR)
     lr_reduce = ReduceLROnPlateau(
         monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
 
