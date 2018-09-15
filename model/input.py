@@ -54,13 +54,13 @@ def expose_generators(train_data, train_labels_stenosis, train_labels_anatomy, v
     shift = 0.2
     train_datagen = ImageDataGenerator(
         rotation_range=20,
-        zoom_range=0.2, width_shift_range=shift, height_shift_range=shift)
+        zoom_range=0.2, width_shift_range=shift, height_shift_range=shift, zca_whitening=True)
 
     val_datagen = ImageDataGenerator()
 
     seed = 1
-    # train_datagen.fit(train_data, augment=True, seed=seed)
-    # val_datagen.fit(val_data, augment=True, seed=seed)
+    train_datagen.fit(train_data, augment=True, seed=seed)
+    val_datagen.fit(val_data, augment=True, seed=seed)
 
     print(train_labels_stenosis.shape)
     print(train_labels_anatomy.shape)

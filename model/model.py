@@ -17,7 +17,7 @@ from time import localtime, strftime
 from .kerasdensenet import DenseNet121, DenseNet169
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
-ADDTNL_TBOARD_TEXT = 'datav2_densev2_lossv2_try3_dense121'
+ADDTNL_TBOARD_TEXT = 'datav2_densev2_lossv2_try4_dense121_zca'
 TENSORBOARD_BASE_DIR = 'experiments/tensorboard'
 
 
@@ -58,7 +58,7 @@ def train_model(model, train_labels_stenosis, train_labels_anatomy, train_data, 
     checkpoint = ModelCheckpoint(
         MODEL_CP_DIR, monitor='val_stenosis_output_acc', verbose=1, save_best_only=True, mode='max')
     lr_reduce = ReduceLROnPlateau(
-        monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1)
+        monitor='val_loss', factor=0.5, patience=10, min_lr=0.0001, verbose=1)
 
     history = model.fit(
         {'main_input': train_data},
