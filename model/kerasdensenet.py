@@ -221,6 +221,10 @@ def DenseNet(blocks,
     elif pooling == 'max':
         bin_stenosis = layers.GlobalMaxPooling2D(
             name='max_pool_stenosis')(bin_stenosis)
+    bin_stenosis = layers.BatchNormalization(axis=bn_axis)(bin_stenosis)
+    bin_stenosis = layers.Dense(40, activation='relu')(bin_stenosis)
+    bin_stenosis = layers.BatchNormalization(axis=bn_axis)(bin_stenosis)
+    bin_stenosis = layers.Dense(40, activation='relu')(bin_stenosis)
     bin_stenosis = layers.Dense(
         1, activation='sigmoid', name='stenosis_output')(bin_stenosis)
 
@@ -236,6 +240,8 @@ def DenseNet(blocks,
             name='avg_pool_anatomy')(anatomy)
     elif pooling == 'max':
         anatomy = layers.GlobalMaxPooling2D(name='max_pool_anatomy')(anatomy)
+    anatomy = layers.BatchNormalization(axis=bn_axis)(anatomy)
+    anatomy = layers.Dense(20, activation='relu')(anatomy)
     anatomy = layers.Dense(4, activation='softmax',
                            name='anatomy_output')(anatomy)
 
