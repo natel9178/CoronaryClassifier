@@ -1,0 +1,40 @@
+2018-09-15 17:28:10.171406: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-09-15 17:28:10.345265: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1356] Found device 0 with properties: 
+name: Tesla K40m major: 3 minor: 5 memoryClockRate(GHz): 0.745
+pciBusID: 0000:02:00.0
+totalMemory: 11.17GiB freeMemory: 11.09GiB
+2018-09-15 17:28:10.345299: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1435] Adding visible gpu devices: 0
+2018-09-15 17:28:11.601787: I tensorflow/core/common_runtime/gpu/gpu_device.cc:923] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-09-15 17:28:11.601842: I tensorflow/core/common_runtime/gpu/gpu_device.cc:929]      0 
+2018-09-15 17:28:11.601849: I tensorflow/core/common_runtime/gpu/gpu_device.cc:942] 0:   N 
+2018-09-15 17:28:11.602120: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1053] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10756 MB memory) -> physical GPU (device: 0, name: Tesla K40m, pci bus id: 0000:02:00.0, compute capability: 3.5)
+Using TensorFlow backend.
+Sanity Check:
+height= 224  width= 224  channel= 3
+training set size= 2952    development set size= 369
+categories= [0. 1.]
+number of category= 2
+------------
+Sanity Check:
+height= 224  width= 224  channel= 3
+training set size= 2952    development set size= 369
+categories= [0. 1. 2. 3.]
+number of category= 4
+------------
+(2952, 1)
+(2952, 4)
+flowed
+Traceback (most recent call last):
+  File "train.py", line 107, in <module>
+    model = build_model(is_training=True, params=params)
+  File "/farmshare/user_data/natelee/coronary/CoronaryClassifier/model/model.py", line 27, in build_model
+    height, width, channel), pooling='avg')
+  File "/farmshare/user_data/natelee/coronary/CoronaryClassifier/model/kerasdensenet.py", line 302, in DenseNet121
+    pooling, classes)
+  File "/farmshare/user_data/natelee/coronary/CoronaryClassifier/model/kerasdensenet.py", line 224, in DenseNet
+    bin_stenosis = layers.BatchNormalization(axis=bn_axis)(bin_stenosis)
+  File "/home/natelee/.local/lib/python3.5/site-packages/keras/engine/base_layer.py", line 431, in __call__
+    self.build(unpack_singleton(input_shapes))
+  File "/home/natelee/.local/lib/python3.5/site-packages/keras/layers/normalization.py", line 92, in build
+    dim = input_shape[self.axis]
+IndexError: tuple index out of range
